@@ -16,7 +16,7 @@
     'paleta-studio': {
       name: 'Paleta Studio',
       shortName: 'PS',
-      url: 'https://danielmoreiradev.github.io/paleta-studio/'
+      url: 'https://danielmoreiradev.github.io/paleta-studio/paleta-studio.html'
     }
   };
 
