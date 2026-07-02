@@ -3,111 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebP Batch Resizer 2.6 - Pixel Perfect</title>
+    <title>Otimizador de Imagens em Lote — Multi-Formato v3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: '#3b82f6',
-                        dark: '#0f172a',
-                        card: '#1e293b',
-                        success: '#22c55e',
-                        warning: '#f59e0b'
-                    },
-                    animation: {
-                        'bounce-short': 'bounce 1s ease-in-out 2'
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+        * { font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Outfit', sans-serif; }
+
+        body {
+            background-color: #F8FAFC;
+            background-image:
+                radial-gradient(circle at 8% 8%, rgba(14,165,233,0.10) 0%, transparent 35%),
+                radial-gradient(circle at 95% 15%, rgba(236,72,153,0.09) 0%, transparent 35%),
+                radial-gradient(circle at 90% 92%, rgba(249,115,22,0.08) 0%, transparent 35%),
+                radial-gradient(circle at 5% 90%, rgba(16,185,129,0.09) 0%, transparent 35%);
+            background-attachment: fixed;
+        }
+
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
         .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .fmt-pill { transition: all 0.15s ease; }
+        .fmt-pill[data-active="true"] { color: #fff; box-shadow: 0 4px 14px -4px var(--pill-shadow); }
+        .fmt-pill[data-active="false"] { background: #fff; }
+        .fmt-pill:disabled { opacity: 0.4; cursor: not-allowed; }
     </style>
 </head>
-<body class="bg-dark text-slate-200 min-h-screen font-sans selection:bg-brand selection:text-white">
+<body class="text-slate-800 min-h-screen selection:bg-sky-200">
 
     <div class="max-w-6xl mx-auto p-4 sm:p-6">
-        
+
         <!-- Header -->
-        <header class="mb-8 flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-slate-700 pb-6 gap-4">
+        <header class="mb-8 flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-slate-200 pb-6 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-white tracking-tight">WebP <span class="text-brand">Batch Resizer</span></h1>
-                <p class="text-slate-400 mt-1 text-sm">Otimização completa: Dimensões, Peso e Formato.</p>
+                <h1 class="font-display text-3xl font-bold text-slate-900 tracking-tight">
+                    Otimizador de <span class="bg-clip-text text-transparent bg-gradient-to-r from-sky-500 via-pink-500 to-orange-500">Imagens em Lote</span>
+                </h1>
+                <p class="text-slate-500 mt-1 text-sm">Redimensione, converta e otimize — JPG, PNG, WebP e ICO.</p>
             </div>
             <div class="flex items-center gap-2">
-                <span class="px-3 py-1 text-xs font-mono rounded-full bg-slate-800 text-brand border border-slate-700">v2.6 Pixel Perfect</span>
+                <span class="px-3 py-1 text-xs font-mono font-semibold rounded-full bg-white text-sky-600 border border-sky-200 shadow-sm">v3.0 Multi-Formato</span>
             </div>
         </header>
 
         <!-- Main Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+
             <!-- Controls Column (Left) -->
             <div class="lg:col-span-4 space-y-6">
-                
+
                 <!-- Drop Zone -->
-                <div id="dropZone" class="glass rounded-xl p-8 text-center border-2 border-dashed border-slate-600 hover:border-brand transition-all cursor-pointer group relative overflow-hidden">
+                <div id="dropZone" class="card rounded-2xl p-8 text-center border-2 border-dashed border-slate-300 hover:border-sky-400 hover:bg-sky-50/40 transition-all cursor-pointer group relative overflow-hidden">
                     <input type="file" id="fileInput" multiple accept="image/*,.zip" class="absolute inset-0 opacity-0 cursor-pointer z-10">
                     <div class="space-y-3 pointer-events-none">
-                        <div class="w-12 h-12 mx-auto bg-slate-800 rounded-full flex items-center justify-center group-hover:bg-brand/20 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400 group-hover:text-brand transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-12 h-12 mx-auto bg-gradient-to-br from-sky-100 to-pink-100 rounded-full flex items-center justify-center group-hover:from-sky-200 group-hover:to-pink-200 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </div>
-                        <div class="text-sm font-medium text-slate-300">
-                            <p>Arraste Imagens ou <span class="text-brand">ZIP</span></p>
+                        <div class="text-sm font-medium text-slate-600">
+                            <p>Arraste Imagens ou <span class="text-sky-500 font-semibold">ZIP</span></p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Importar da Web (URL ou colar imagem) -->
+                <div class="card rounded-2xl p-4 space-y-3 shadow-sm">
+                    <h3 class="text-xs font-bold text-sky-500 uppercase tracking-wider">Importar da Web</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="urlInput" placeholder="Cole o link (URL) da imagem..." class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 focus:border-sky-400 focus:ring-2 focus:ring-sky-100 focus:outline-none">
+                        <button id="importUrlBtn" class="bg-sky-500 hover:bg-sky-600 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-colors shadow-sm whitespace-nowrap">Importar</button>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Ou cole uma imagem copiada (<span class="font-mono">Ctrl+V</span>) em qualquer lugar da página. Alguns sites bloqueiam o download direto por CORS — se falhar, baixe a imagem manualmente e arraste aqui.</p>
                 </div>
 
                 <!-- Settings -->
-                <div class="glass rounded-xl p-5 space-y-5">
-                    <div class="space-y-3 pb-5 border-b border-slate-700">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Renomeação</h3>
-                        <div>
-                            <div class="flex gap-2">
-                                <input type="text" id="prefixInput" placeholder="Ex: site-img-" class="flex-1 bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm focus:border-brand focus:outline-none">
-                                <button id="applyPrefixBtn" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-xs font-bold text-white transition-colors">Aplicar</button>
-                            </div>
+                <div class="card rounded-2xl p-5 space-y-5 shadow-sm">
+
+                    <!-- Formato de Saída -->
+                    <div class="space-y-3 pb-5 border-b border-slate-200">
+                        <h3 class="text-xs font-bold text-orange-500 uppercase tracking-wider">Formato de Saída</h3>
+                        <div id="formatPills" class="grid grid-cols-4 gap-2">
+                            <button type="button" data-format="jpg" class="fmt-pill" style="--pill-shadow: rgba(249,115,22,0.4)">
+                                <span class="block py-2 rounded-lg border border-orange-200 text-orange-600 text-xs font-bold">JPG</span>
+                            </button>
+                            <button type="button" data-format="png" class="fmt-pill" style="--pill-shadow: rgba(236,72,153,0.4)">
+                                <span class="block py-2 rounded-lg border border-pink-200 text-pink-600 text-xs font-bold">PNG</span>
+                            </button>
+                            <button type="button" data-format="webp" class="fmt-pill" style="--pill-shadow: rgba(14,165,233,0.4)">
+                                <span class="block py-2 rounded-lg border border-sky-200 text-sky-600 text-xs font-bold">WEBP</span>
+                            </button>
+                            <button type="button" data-format="ico" class="fmt-pill" style="--pill-shadow: rgba(99,102,241,0.4)">
+                                <span class="block py-2 rounded-lg border border-indigo-200 text-indigo-600 text-xs font-bold">ICO</span>
+                            </button>
+                        </div>
+                        <p id="icoHint" class="hidden text-[11px] text-indigo-400">ℹ️ ICO é pensado para favicons — a imagem é limitada a no máx. 256×256px.</p>
+                    </div>
+
+                    <!-- Renomeação -->
+                    <div class="space-y-3 pb-5 border-b border-slate-200">
+                        <h3 class="text-xs font-bold text-pink-500 uppercase tracking-wider">Renomeação</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="prefixInput" placeholder="Ex: site-img-" class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 focus:outline-none">
+                            <button id="applyPrefixBtn" class="bg-pink-500 hover:bg-pink-600 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-colors shadow-sm">Aplicar</button>
                         </div>
                     </div>
 
+                    <!-- Ajustes de Saída -->
                     <div class="space-y-4">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ajustes de Saída</h3>
+                        <h3 class="text-xs font-bold text-sky-500 uppercase tracking-wider">Ajustes de Saída</h3>
                         <div>
                             <div class="flex justify-between items-center mb-1">
-                                <label class="text-sm font-medium text-slate-300">Escala (%)</label>
-                                <span id="scaleValue" class="text-brand font-bold font-mono text-sm">100%</span>
+                                <label class="text-sm font-medium text-slate-600">Escala (%)</label>
+                                <span id="scaleValue" class="text-sky-600 font-bold font-mono text-sm">100%</span>
                             </div>
-                            <input type="range" id="scaleInput" min="1" max="100" value="100" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand">
+                            <input type="range" id="scaleInput" min="1" max="100" value="100" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-500">
                         </div>
-                        <div>
+                        <div id="qualityWrapper">
                             <div class="flex justify-between items-center mb-1">
-                                <label class="text-sm font-medium text-slate-300">Qualidade WebP</label>
-                                <span id="qualityValue" class="text-slate-400 text-xs font-mono">80%</span>
+                                <label class="text-sm font-medium text-slate-600">Qualidade</label>
+                                <span id="qualityValue" class="text-emerald-600 text-xs font-mono font-bold">80%</span>
                             </div>
-                            <input type="range" id="qualityInput" min="10" max="100" value="80" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-slate-500">
+                            <input type="range" id="qualityInput" min="10" max="100" value="80" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                            <p id="qualityHint" class="text-[11px] text-slate-400 mt-1">Compressão aplicada ao exportar.</p>
                         </div>
                     </div>
                 </div>
 
-                <button id="processBtn" disabled class="w-full py-4 px-4 bg-brand hover:bg-blue-600 disabled:bg-slate-800 disabled:text-slate-600 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-lg flex justify-center items-center gap-2 group">
+                <button id="processBtn" disabled class="w-full py-4 px-4 bg-sky-500 hover:bg-sky-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-all shadow-lg shadow-sky-200 flex justify-center items-center gap-2 group">
                     <span id="btnText">1. Processar Fila</span>
                     <svg id="loadingIcon" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -115,43 +153,56 @@
                     </svg>
                 </button>
 
-                <button id="downloadZipBtn" class="hidden w-full py-3 px-4 bg-success hover:bg-green-500 text-white font-bold rounded-xl transition-all shadow-lg flex justify-center items-center gap-2">
+                <button id="downloadZipBtn" class="hidden w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-200 flex justify-center items-center gap-2">
                     2. Baixar Tudo (.ZIP)
                 </button>
-                
-                <div id="statusArea" class="hidden p-3 rounded-lg bg-slate-800 border border-slate-700 text-xs font-mono text-center text-slate-300">
+
+                <div id="statusArea" class="hidden p-3 rounded-xl bg-white border border-slate-200 text-xs font-mono text-center text-slate-500 shadow-sm">
                     Aguardando...
                 </div>
             </div>
 
             <!-- List Column (Right) -->
             <div class="lg:col-span-8 h-full min-h-[500px]">
-                <div class="glass rounded-xl p-6 h-full flex flex-col">
+                <div class="card rounded-2xl p-6 h-full flex flex-col shadow-sm">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-                            Fila de Arquivos 
-                            <span id="fileCount" class="text-xs bg-slate-700 px-2 py-0.5 rounded text-slate-300">0</span>
+                        <h2 class="font-display text-lg font-semibold text-slate-900 flex items-center gap-2">
+                            Fila de Arquivos
+                            <span id="fileCount" class="text-xs bg-slate-100 px-2 py-0.5 rounded-full text-slate-500 font-mono font-bold">0</span>
                         </h2>
-                        <button id="clearBtn" class="text-xs text-red-400 hover:text-red-300 hidden">Limpar Tudo</button>
+                        <button id="clearBtn" class="text-xs text-pink-400 hover:text-pink-600 font-medium hidden">Limpar Tudo</button>
                     </div>
 
                     <!-- Column Headers -->
-                    <div class="grid grid-cols-12 gap-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-3">
+                    <div class="grid grid-cols-12 gap-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">
                         <div class="col-span-2 text-center">Prévia</div>
                         <div class="col-span-4">Arquivo</div>
                         <div class="col-span-4 text-right">Info (Antes -> Depois)</div>
                         <div class="col-span-2 text-center">Ação</div>
                     </div>
-                    
+
                     <!-- File List -->
                     <div id="fileList" class="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                         <!-- Empty State -->
-                        <div id="emptyState" class="h-full flex flex-col items-center justify-center text-slate-600 opacity-50 mt-10">
+                        <div id="emptyState" class="h-full flex flex-col items-center justify-center text-slate-400 mt-10">
                             <p>Importe imagens ou pastas ZIP</p>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal (Antes / Depois) -->
+    <div id="previewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm" onclick="closePreviewOnOverlay(event)">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-5 relative">
+            <button onclick="closePreview()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-1.5 rounded-lg transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <h3 id="previewTitle" class="font-display text-lg font-bold text-slate-900 mb-4 pr-8"></h3>
+            <div id="previewContent" class="grid gap-4"></div>
         </div>
     </div>
 
@@ -165,6 +216,8 @@
         const scaleValue = document.getElementById('scaleValue');
         const qualityInput = document.getElementById('qualityInput');
         const qualityValue = document.getElementById('qualityValue');
+        const qualityWrapper = document.getElementById('qualityWrapper');
+        const qualityHint = document.getElementById('qualityHint');
         const processBtn = document.getElementById('processBtn');
         const downloadZipBtn = document.getElementById('downloadZipBtn');
         const btnText = document.getElementById('btnText');
@@ -173,9 +226,67 @@
         const clearBtn = document.getElementById('clearBtn');
         const prefixInput = document.getElementById('prefixInput');
         const applyPrefixBtn = document.getElementById('applyPrefixBtn');
+        const formatPills = document.getElementById('formatPills');
+        const icoHint = document.getElementById('icoHint');
+        const urlInput = document.getElementById('urlInput');
+        const importUrlBtn = document.getElementById('importUrlBtn');
+        const previewModal = document.getElementById('previewModal');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewContent = document.getElementById('previewContent');
+
+        // Formatos suportados: mime, extensão, se aceita controle de qualidade
+        // ICO não usa canvas.toBlob diretamente: é montado a partir de um PNG (suporte universal).
+        const FORMATS = {
+            jpg:  { mime: 'image/jpeg', ext: 'jpg',  supportsQuality: true,  supported: true },
+            png:  { mime: 'image/png',  ext: 'png',  supportsQuality: false, supported: true },
+            webp: { mime: 'image/webp', ext: 'webp', supportsQuality: true,  supported: true },
+            ico:  { mime: 'image/x-icon', ext: 'ico', supportsQuality: false, supported: true, custom: true }
+        };
 
         let queue = [];
         let hasProcessed = false;
+        let outputFormat = 'webp';
+
+        function setOutputFormat(fmt) {
+            if (!FORMATS[fmt]) return;
+            outputFormat = fmt;
+            renderFormatPills();
+            const supportsQuality = FORMATS[outputFormat].supportsQuality;
+            qualityWrapper.classList.toggle('opacity-40', !supportsQuality);
+            qualityWrapper.classList.toggle('pointer-events-none', !supportsQuality);
+            qualityHint.textContent = supportsQuality
+                ? 'Compressão aplicada ao exportar.'
+                : (fmt === 'ico' ? 'ICO usa PNG internamente — qualidade não se aplica.' : 'PNG é sem perdas — qualidade não se aplica.');
+            icoHint.classList.toggle('hidden', fmt !== 'ico');
+            renderList();
+            if (hasProcessed) btnText.textContent = "♻️ Reprocessar Fila";
+        }
+
+        function renderFormatPills() {
+            formatPills.querySelectorAll('.fmt-pill').forEach(btn => {
+                const fmt = btn.dataset.format;
+                const active = fmt === outputFormat;
+                btn.dataset.active = active;
+                const inner = btn.querySelector('span');
+                if (active) {
+                    const bg = { jpg: 'bg-orange-500', png: 'bg-pink-500', webp: 'bg-sky-500', ico: 'bg-indigo-500' }[fmt];
+                    inner.className = `block py-2 rounded-lg border border-transparent text-xs font-bold ${bg} text-white`;
+                } else {
+                    const colors = {
+                        jpg:  'border-orange-200 text-orange-600',
+                        png:  'border-pink-200 text-pink-600',
+                        webp: 'border-sky-200 text-sky-600',
+                        ico:  'border-indigo-200 text-indigo-600'
+                    }[fmt];
+                    inner.className = `block py-2 rounded-lg border ${colors} text-xs font-bold bg-white`;
+                }
+            });
+        }
+
+        formatPills.querySelectorAll('.fmt-pill').forEach(btn => {
+            btn.addEventListener('click', () => setOutputFormat(btn.dataset.format));
+        });
+        renderFormatPills();
 
         function formatBytes(bytes) {
             if (bytes === 0) return '0 B';
@@ -199,25 +310,91 @@
             scaleValue.textContent = `${e.target.value}%`;
             if (hasProcessed) btnText.textContent = "♻️ Reprocessar Fila";
         });
-        
+
         qualityInput.addEventListener('input', (e) => {
             qualityValue.textContent = `${e.target.value}%`;
             if (hasProcessed) btnText.textContent = "♻️ Reprocessar Fila";
         });
 
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-brand', 'bg-slate-800/50'); });
-        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('border-brand', 'bg-slate-800/50'); });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-sky-400', 'bg-sky-50/50'); });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('border-sky-400', 'bg-sky-50/50'); });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.classList.remove('border-brand', 'bg-slate-800/50');
+            dropZone.classList.remove('border-sky-400', 'bg-sky-50/50');
             if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
         });
         fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
+        // --- Importar imagem via URL ---
+        importUrlBtn.addEventListener('click', () => importFromUrl());
+        urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') importFromUrl(); });
+
+        async function importFromUrl() {
+            const url = urlInput.value.trim();
+            if (!url) return;
+            statusArea.classList.remove('hidden');
+            statusArea.textContent = 'Baixando imagem da URL...';
+            importUrlBtn.disabled = true;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const blob = await response.blob();
+                if (!blob.type.startsWith('image/')) throw new Error('O link não retornou uma imagem.');
+                let name = decodeURIComponent(url.split('/').pop().split('?')[0] || '') || 'imagem-web';
+                if (!/\.[a-z0-9]+$/i.test(name)) {
+                    const extFromType = (blob.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+                    name = `${name}.${extFromType}`;
+                }
+                const file = new File([blob], name, { type: blob.type });
+                const dims = await getImageDimensions(file);
+                queue = [...queue, createQueueItem(file, dims)];
+                renderList();
+                processBtn.disabled = false;
+                emptyState.classList.add('hidden');
+                clearBtn.classList.remove('hidden');
+                statusArea.textContent = 'Imagem importada da web.';
+                urlInput.value = '';
+            } catch (err) {
+                console.error(err);
+                statusArea.textContent = 'Não foi possível importar (link inválido ou bloqueio de CORS do site).';
+            } finally {
+                importUrlBtn.disabled = false;
+            }
+        }
+
+        // --- Colar imagem (Ctrl+V) da área de transferência ---
+        window.addEventListener('paste', async (e) => {
+            const items = e.clipboardData && e.clipboardData.items;
+            if (!items) return;
+            const imageItems = Array.from(items).filter(it => it.type && it.type.startsWith('image/'));
+            if (imageItems.length === 0) return;
+            e.preventDefault();
+            statusArea.classList.remove('hidden');
+            statusArea.textContent = 'Colando imagem...';
+
+            const itemsToAdd = [];
+            for (const it of imageItems) {
+                const blob = it.getAsFile();
+                if (!blob) continue;
+                const ext = (blob.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+                const file = new File([blob], `colada-${Date.now()}.${ext}`, { type: blob.type });
+                const dims = await getImageDimensions(file);
+                itemsToAdd.push(createQueueItem(file, dims));
+            }
+            if (itemsToAdd.length > 0) {
+                queue = [...queue, ...itemsToAdd];
+                renderList();
+                processBtn.disabled = false;
+                emptyState.classList.add('hidden');
+                clearBtn.classList.remove('hidden');
+                statusArea.textContent = 'Imagem colada com sucesso.';
+            }
+        });
+
         async function handleFiles(files) {
             statusArea.classList.remove('hidden');
             statusArea.textContent = 'Lendo arquivos...';
-            
+
             const fileArray = Array.from(files);
             const itemsToAdd = [];
 
@@ -225,7 +402,7 @@
                 if (file.type === "application/zip" || file.name.endsWith('.zip')) {
                     try {
                         const zip = await JSZip.loadAsync(file);
-                        const entries = Object.keys(zip.files).filter(name => !zip.files[name].dir && /\.(jpe?g|png|webp|gif|bmp)$/i.test(name));
+                        const entries = Object.keys(zip.files).filter(name => !zip.files[name].dir && /\.(jpe?g|png|webp|gif|bmp|avif)$/i.test(name));
                         for (const name of entries) {
                             const blob = await zip.files[name].async("blob");
                             const extractedFile = new File([blob], name.split('/').pop(), { type: blob.type });
@@ -253,15 +430,17 @@
             return {
                 id: Math.random().toString(36).substr(2, 9),
                 originalFile: file,
-                previewUrl: URL.createObjectURL(file), 
-                customName: file.name.replace(/\.[^/.]+$/, ""), 
+                previewUrl: URL.createObjectURL(file),
+                customName: file.name.replace(/\.[^/.]+$/, ""),
                 origWidth: dimensions.width,
                 origHeight: dimensions.height,
                 status: 'pending',
                 blob: null,
                 processedSize: null,
                 processedWidth: null,
-                processedHeight: null
+                processedHeight: null,
+                processedFormat: null,
+                processedPreviewUrl: null
             };
         }
 
@@ -277,12 +456,13 @@
 
             queue.forEach((item, index) => {
                 const isDone = item.status === 'done';
-                
-                // HTML de Informações (Peso e Dimensões)
+                const pendingExt = FORMATS[outputFormat].ext;
+                const doneExt = item.processedFormat ? FORMATS[item.processedFormat].ext : pendingExt;
+
                 let infoHtml = `
                     <div class="flex flex-col items-end gap-0.5">
-                        <span class="text-slate-400 font-bold">${formatBytes(item.originalFile.size)}</span>
-                        <span class="text-[10px] text-slate-500 font-mono">${item.origWidth}×${item.origHeight}px</span>
+                        <span class="text-slate-500 font-bold">${formatBytes(item.originalFile.size)}</span>
+                        <span class="text-[10px] text-slate-400 font-mono">${item.origWidth}×${item.origHeight}px</span>
                     </div>
                 `;
 
@@ -290,54 +470,58 @@
                     infoHtml = `
                         <div class="flex flex-col items-end gap-0.5">
                             <div class="flex items-center gap-2">
-                                <span class="text-[10px] text-slate-500 line-through">${formatBytes(item.originalFile.size)}</span>
-                                <span class="text-success font-bold text-sm">${formatBytes(item.processedSize)}</span>
+                                <span class="text-[10px] text-slate-400 line-through">${formatBytes(item.originalFile.size)}</span>
+                                <span class="text-emerald-600 font-bold text-sm">${formatBytes(item.processedSize)}</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="text-[9px] text-slate-600 line-through">${item.origWidth}×${item.origHeight}px</span>
-                                <span class="text-brand font-mono text-[11px] font-bold">${item.processedWidth}×${item.processedHeight}px</span>
+                                <span class="text-[9px] text-slate-400 line-through">${item.origWidth}×${item.origHeight}px</span>
+                                <span class="text-sky-600 font-mono text-[11px] font-bold">${item.processedWidth}×${item.processedHeight}px</span>
                             </div>
                         </div>
                     `;
                 }
 
                 const div = document.createElement('div');
-                div.className = `grid grid-cols-12 gap-4 items-center p-2 rounded-lg border transition-all ${isDone ? 'border-success/30 bg-success/5' : 'border-slate-700 bg-slate-800/40'}`;
-                
+                div.className = `grid grid-cols-12 gap-4 items-center p-2 rounded-xl border transition-all ${isDone ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200 bg-white/60'}`;
+
                 div.innerHTML = `
-                    <div class="col-span-2 flex justify-center items-center h-12 w-12 mx-auto bg-slate-900 rounded overflow-hidden border border-slate-700 relative">
+                    <div class="col-span-2 flex justify-center items-center h-12 w-12 mx-auto bg-slate-100 rounded-lg overflow-hidden border border-slate-200 relative cursor-pointer group/thumb" onclick="openPreview(${index})" title="Ver prévia grande">
                         <img src="${item.previewUrl}" class="h-full w-full object-cover" alt="Preview">
+                        <div class="absolute inset-0 bg-slate-900/0 group-hover/thumb:bg-slate-900/40 transition-colors flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                            </svg>
+                        </div>
                     </div>
-                    
+
                     <div class="col-span-4 min-w-0">
                         <div class="flex items-center gap-1">
-                            <input type="text" 
-                                class="w-full bg-transparent border-b border-transparent focus:border-brand focus:outline-none text-sm text-slate-200 py-1 truncate"
+                            <input type="text"
+                                class="w-full bg-transparent border-b border-transparent focus:border-sky-400 focus:outline-none text-sm text-slate-700 py-1 truncate"
                                 value="${item.customName}"
                                 onchange="updateName(${index}, this.value)"
                             >
-                            <span class="text-xs text-slate-500 font-mono">.webp</span>
+                            <span class="text-xs text-slate-400 font-mono">.${isDone ? doneExt : pendingExt}</span>
                         </div>
                     </div>
-                    
+
                     <div class="col-span-4 text-right">
                         ${infoHtml}
                     </div>
-                    
-                    <div class="col-span-2 flex justify-center items-center gap-2">
-                        ${!isDone ? `
-                            <button onclick="removeItem(${index})" class="text-slate-600 hover:text-red-400 p-1.5 rounded">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        ` : `
-                            <button onclick="downloadIndividual(${index})" class="pop-in bg-success hover:bg-green-600 text-white p-2 rounded-lg shadow-lg">
+
+                    <div class="col-span-2 flex justify-center items-center gap-1">
+                        <button onclick="removeItem(${index})" class="text-slate-300 hover:text-pink-500 p-1.5 rounded-lg transition-colors" title="Excluir">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        ${isDone ? `
+                            <button onclick="downloadIndividual(${index})" class="pop-in bg-emerald-500 hover:bg-emerald-600 text-white p-2 rounded-lg shadow-lg shadow-emerald-100" title="Baixar">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
                             </button>
-                        `}
+                        ` : ``}
                     </div>
                 `;
                 fileList.appendChild(div);
@@ -350,17 +534,56 @@
 
         window.removeItem = (index) => {
             URL.revokeObjectURL(queue[index].previewUrl);
+            if (queue[index].processedPreviewUrl) URL.revokeObjectURL(queue[index].processedPreviewUrl);
             queue.splice(index, 1);
             renderList();
         };
 
+        window.openPreview = (index) => {
+            const item = queue[index];
+            if (!item) return;
+            previewTitle.textContent = item.customName;
+            const isDone = item.status === 'done' && item.processedPreviewUrl;
+            if (isDone) {
+                previewContent.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4';
+                previewContent.innerHTML = `
+                    <div class="space-y-2">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Antes</p>
+                        <img src="${item.previewUrl}" class="w-full rounded-xl border border-slate-200 object-contain max-h-[50vh] bg-slate-50">
+                        <p class="text-center text-xs text-slate-500 font-mono">${item.origWidth}×${item.origHeight}px · ${formatBytes(item.originalFile.size)}</p>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-xs font-bold text-emerald-500 uppercase tracking-wider text-center">Depois</p>
+                        <img src="${item.processedPreviewUrl}" class="w-full rounded-xl border border-emerald-200 object-contain max-h-[50vh] bg-slate-50">
+                        <p class="text-center text-xs text-emerald-600 font-mono font-bold">${item.processedWidth}×${item.processedHeight}px · ${formatBytes(item.processedSize)}</p>
+                    </div>
+                `;
+            } else {
+                previewContent.className = 'grid grid-cols-1 gap-4';
+                previewContent.innerHTML = `
+                    <div class="space-y-2">
+                        <img src="${item.previewUrl}" class="w-full rounded-xl border border-slate-200 object-contain max-h-[60vh] bg-slate-50 mx-auto">
+                        <p class="text-center text-xs text-slate-500 font-mono">${item.origWidth}×${item.origHeight}px · ${formatBytes(item.originalFile.size)}</p>
+                    </div>
+                `;
+            }
+            previewModal.classList.remove('hidden');
+        };
+
+        window.closePreview = () => previewModal.classList.add('hidden');
+        window.closePreviewOnOverlay = (e) => { if (e.target.id === 'previewModal') closePreview(); };
+
         window.downloadIndividual = (index) => {
             const item = queue[index];
-            if (item.blob) saveAs(item.blob, `${item.customName}.webp`);
+            const ext = FORMATS[item.processedFormat].ext;
+            if (item.blob) saveAs(item.blob, `${item.customName}.${ext}`);
         };
 
         clearBtn.addEventListener('click', () => {
-            queue.forEach(item => URL.revokeObjectURL(item.previewUrl));
+            queue.forEach(item => {
+                URL.revokeObjectURL(item.previewUrl);
+                if (item.processedPreviewUrl) URL.revokeObjectURL(item.processedPreviewUrl);
+            });
             queue = [];
             fileInput.value = '';
             hasProcessed = false;
@@ -383,27 +606,30 @@
             processBtn.disabled = true;
             btnText.textContent = 'Otimizando...';
             loadingIcon.classList.remove('hidden');
-            
+
             const scale = parseInt(scaleInput.value) / 100;
             const quality = parseInt(qualityInput.value) / 100;
-            
+
             try {
                 for (let i = 0; i < queue.length; i++) {
                     const item = queue[i];
                     statusArea.textContent = `Processando ${i + 1}/${queue.length}...`;
-                    
-                    const result = await processImageToWebP(item.originalFile, scale, quality);
-                    
+
+                    const result = await processImage(item.originalFile, scale, quality, outputFormat);
+
                     item.blob = result.blob;
                     item.processedSize = result.blob.size;
                     item.processedWidth = result.width;
                     item.processedHeight = result.height;
+                    item.processedFormat = outputFormat;
                     item.status = 'done';
-                    if (i % 2 === 0) renderList(); 
+                    if (item.processedPreviewUrl) URL.revokeObjectURL(item.processedPreviewUrl);
+                    item.processedPreviewUrl = URL.createObjectURL(result.blob);
+                    if (i % 2 === 0) renderList();
                 }
                 hasProcessed = true;
                 statusArea.textContent = 'Pronto!';
-                renderList(); 
+                renderList();
                 btnText.textContent = "♻️ Reprocessar Tudo";
                 downloadZipBtn.classList.remove('hidden');
             } catch (error) {
@@ -418,32 +644,94 @@
         downloadZipBtn.addEventListener('click', async () => {
             const zip = new JSZip();
             const prefix = prefixInput.value.trim();
-            const zipFilename = prefix ? `${prefix}.zip` : "fotos_otimizadas.zip";
-            queue.forEach(item => { if (item.blob) zip.file(`${item.customName}.webp`, item.blob); });
+            const zipFilename = prefix ? `${prefix}.zip` : "imagens_otimizadas.zip";
+            queue.forEach(item => {
+                if (item.blob) {
+                    const ext = FORMATS[item.processedFormat].ext;
+                    zip.file(`${item.customName}.${ext}`, item.blob);
+                }
+            });
             const content = await zip.generateAsync({type:"blob"});
             saveAs(content, zipFilename);
         });
 
-        function processImageToWebP(file, scale, quality) {
+        // Monta um arquivo .ico válido embrulhando um PNG (suportado nativamente desde o Vista/OS X 10.7+).
+        // Isso evita depender de canvas.toBlob('image/x-icon'), que não existe em nenhum navegador.
+        function buildIco(pngArrayBuffer, width, height) {
+            const header = new ArrayBuffer(6);
+            const hv = new DataView(header);
+            hv.setUint16(0, 0, true);  // reserved
+            hv.setUint16(2, 1, true);  // type: 1 = icon
+            hv.setUint16(4, 1, true);  // number of images
+
+            const entry = new ArrayBuffer(16);
+            const ev = new DataView(entry);
+            ev.setUint8(0, width >= 256 ? 0 : width);   // 0 significa 256px
+            ev.setUint8(1, height >= 256 ? 0 : height);
+            ev.setUint8(2, 0);   // color palette (0 = sem paleta)
+            ev.setUint8(3, 0);   // reserved
+            ev.setUint16(4, 1, true);  // color planes
+            ev.setUint16(6, 32, true); // bits per pixel
+            ev.setUint32(8, pngArrayBuffer.byteLength, true); // tamanho dos dados da imagem
+            ev.setUint32(12, 22, true); // offset (6 header + 16 entry)
+
+            return new Blob([header, entry, pngArrayBuffer], { type: 'image/x-icon' });
+        }
+
+        function processImage(file, scale, quality, format) {
+            const fmtInfo = FORMATS[format];
             return new Promise((resolve, reject) => {
                 const tempUrl = URL.createObjectURL(file);
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const width = Math.floor(img.width * scale);
-                    const height = Math.floor(img.height * scale);
+                    let width = Math.floor(img.width * scale);
+                    let height = Math.floor(img.height * scale);
+
+                    // ICO é pensado para ícones/favicons: limita a no máximo 256x256 mantendo proporção.
+                    if (format === 'ico') {
+                        const maxDim = 256;
+                        if (width > maxDim || height > maxDim) {
+                            const ratio = Math.min(maxDim / width, maxDim / height);
+                            width = Math.max(1, Math.floor(width * ratio));
+                            height = Math.max(1, Math.floor(height * ratio));
+                        }
+                    }
+
                     canvas.width = width;
                     canvas.height = height;
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
+
+                    // JPG não suporta transparência: preenche fundo branco para evitar preto.
+                    if (format === 'jpg') {
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, width, height);
+                    }
+
                     ctx.drawImage(img, 0, 0, width, height);
+
+                    if (format === 'ico') {
+                        canvas.toBlob(async (pngBlob) => {
+                            URL.revokeObjectURL(tempUrl);
+                            if (!pngBlob) { reject(new Error('Fail')); return; }
+                            try {
+                                const pngBuffer = await pngBlob.arrayBuffer();
+                                const icoBlob = buildIco(pngBuffer, width, height);
+                                resolve({ blob: icoBlob, width, height });
+                            } catch (err) { reject(err); }
+                        }, 'image/png');
+                        return;
+                    }
+
                     canvas.toBlob((blob) => {
                         URL.revokeObjectURL(tempUrl);
                         if (blob) resolve({ blob, width, height });
                         else reject(new Error('Fail'));
-                    }, 'image/webp', quality);
+                    }, fmtInfo.mime, fmtInfo.supportsQuality ? quality : undefined);
                 };
+                img.onerror = () => { URL.revokeObjectURL(tempUrl); reject(new Error('Falha ao carregar imagem')); };
                 img.src = tempUrl;
             });
         }
