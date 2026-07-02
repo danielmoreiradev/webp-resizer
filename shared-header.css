@@ -1,0 +1,232 @@
+/* ========================================
+   CABEÇALHO COMPARTILHADO ENTRE PROJETOS
+   ======================================== */
+
+:root {
+  --header-bg: #ffffff;
+  --header-border: #e5e7eb;
+  --header-text: #1f2937;
+  --header-text-light: #6b7280;
+  --header-accent: #3b82f6;
+  --header-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.shared-header {
+  position: relative;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  box-shadow: var(--header-shadow);
+  z-index: 40;
+}
+
+.shared-header-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+  gap: 20px;
+}
+
+/* ========== LOGO ========== */
+.shared-header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.shared-header-logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: #fff;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+}
+
+.shared-header-logo-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--header-text);
+  line-height: 1;
+}
+
+.shared-header-logo-text small {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--header-text-light);
+  margin-top: 2px;
+}
+
+/* ========== NAVEGAÇÃO ========== */
+.shared-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+}
+
+.shared-header-nav a {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--header-text-light);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.shared-header-nav a:hover {
+  color: var(--header-text);
+  background: #f3f4f6;
+}
+
+.shared-header-nav a.active {
+  color: var(--header-accent);
+  background: #eff6ff;
+  font-weight: 600;
+}
+
+/* ========== MOBILE MENU BUTTON ========== */
+.shared-header-mobile-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.shared-header-mobile-btn:hover {
+  background: #f3f4f6;
+}
+
+.shared-header-mobile-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--header-text);
+  stroke-width: 2;
+}
+
+/* ========== MOBILE MENU ========== */
+.shared-header-mobile-menu {
+  display: none;
+  position: absolute;
+  top: 70px;
+  left: 0;
+  right: 0;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 0;
+  animation: slideDown 0.3s ease;
+}
+
+.shared-header-mobile-menu.open {
+  display: flex;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.shared-header-mobile-menu a {
+  display: block;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--header-text-light);
+  border-radius: 0;
+  transition: all 0.2s ease;
+}
+
+.shared-header-mobile-menu a:hover {
+  color: var(--header-text);
+  background: #f3f4f6;
+}
+
+.shared-header-mobile-menu a.active {
+  color: var(--header-accent);
+  background: #eff6ff;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 768px) {
+  .shared-header-wrapper {
+    height: 60px;
+    padding: 0 16px;
+  }
+
+  .shared-header-logo-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .shared-header-logo-text {
+    font-size: 14px;
+  }
+
+  .shared-header-logo-text small {
+    font-size: 10px;
+  }
+
+  .shared-header-nav {
+    display: none;
+  }
+
+  .shared-header-mobile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .shared-header-wrapper {
+    height: 56px;
+    padding: 0 12px;
+  }
+
+  .shared-header-logo-text small {
+    display: none;
+  }
+
+  .shared-header-logo-text {
+    font-size: 13px;
+  }
+
+  .shared-header-mobile-menu a {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+/* Não interferir com outros estilos da página */
+.shared-header * {
+  box-sizing: border-box;
+}
