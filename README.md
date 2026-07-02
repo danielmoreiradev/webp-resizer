@@ -4,6 +4,8 @@ Ferramenta front-end leve (apenas HTML/JS/CSS) para redimensionar, converter, re
 
 > Aviso importante: este código foi gerado por IA para suprir uma necessidade específica de um desenvolvedor durante seu trabalho. Ele serve como ponto de partida funcional e prático, mas pode requerer revisões, testes adicionais e adaptações antes de uso em produção. Veja a seção "Observações sobre código gerado por IA" abaixo.
 
+> Acesse na integra: https://danielmoreiradev.github.io/webp-resizer/
+
 Principais recursos
 - Upload via arrastar & soltar ou seleção de arquivos.
 - Pré-visualização de imagens.
